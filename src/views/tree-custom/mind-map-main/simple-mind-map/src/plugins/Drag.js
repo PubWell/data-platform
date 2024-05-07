@@ -292,12 +292,12 @@ class Drag extends Base {
       // 如果当前被拖拽的节点数量大于1，那么创建一个矩形示意
       if (this.beingDragNodeList.length > 1) {
         let group = new G()// 节点容器
-        let t = this.beingDragNodeList[this.beingDragNodeList.length - 1], { width, height } = t
+        let t = this.beingDragNodeList[this.beingDragNodeList.length - 1], { width, height } = t, p = 5
         let numNode = new Text().text(this.beingDragNodeList.length), {width: w, height: h} = numNode.bbox()
-        numNode.x(width - w+2).y(-h+2)
+        numNode.x(width - w).y(-h)
         
-        group.rect(w+5, h+5).x(width - w).y(-h)
-          .radius((h)/2)
+        group.rect(w + 2 * p, h + 2 * p).x(width - (w + p)).y(-(h + p))
+          .radius(p)
           .fill({
             color: rectFill || lineColor
           })

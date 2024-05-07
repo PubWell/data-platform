@@ -148,11 +148,54 @@ class OrganizationStructure extends Base {
 
   //  绘制连线，连接该节点到其子节点
   renderLine(node, lines, style, lineStyle) {
-    if (lineStyle === 'direct') {
+    if (lineStyle === 'curve') {
+      this.renderLineCurve(node, lines, style)
+    } else if (lineStyle === 'direct') {
       this.renderLineDirect(node, lines, style)
     } else {
       this.renderLineStraight(node, lines, style)
     }
+  }
+
+  //  曲线风格连线
+  renderLineCurve(node, lines, style) {
+    if (node.children.length <= 0) {
+      return []
+    }
+    let { left, top, width, height, expandBtnSize } = node
+    if (!this.mindMap.opt.alwaysShowExpandBtn) {
+      expandBtnSize = 0
+    }
+    const {
+      nodeUseLineStyle,
+      rootLineStartPositionKeepSameInCurve,
+      rootLineKeepSameInCurve
+    } = this.mindMap.themeConfig
+    node.children.forEach((item, index) => {
+      if (node.layerIndex === 0) {
+        expandBtnSize = 0
+      }
+      let x1 =
+        node.layerIndex === 0 && !rootLineStartPositionKeepSameInCurve
+          ? left + width / 2
+          : left + width / 2
+      let y1 = top + height
+      let x2 = item.left + item.width / 2
+      let y2 = item.top
+      let path = ''
+      y1 = nodeUseLineStyle && !node.isRoot ? y1 + height / 2 : y1
+      y2 = nodeUseLineStyle ? y2 + item.height / 2 : y2
+      // 节点使用横线风格，需要额外渲染横线
+      let nodeUseLineStylePath = nodeUseLineStyle
+        ? ` L ${item.left + item.width},${y2}`
+        : ''
+      if (node.isRoot && !rootLineKeepSameInCurve) {
+        path = this.quadraticCurvePathVertical(x1, y1, x2, y2) + nodeUseLineStylePath
+      } else {
+        path = this.cubicBezierPathVertical(x1, y1, x2, y2) + nodeUseLineStylePath
+      }
+      this.setLineStyle(style, lines[index], path, item)
+    })
   }
 
   //  直连风格

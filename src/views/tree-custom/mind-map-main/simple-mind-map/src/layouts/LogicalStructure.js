@@ -237,7 +237,7 @@ class LogicalStructure extends Base {
       }
       let x1 =
         node.layerIndex === 0 && !rootLineStartPositionKeepSameInCurve
-          ? left + width / 2
+          ? left + width
           : left + width + expandBtnSize
       let y1 = top + height / 2
       let x2 = item.left

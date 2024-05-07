@@ -305,6 +305,23 @@ class Base {
     return `M ${x1},${y1} C ${cx1},${cy1} ${cx2},${cy2} ${x2},${y2}`
   }
 
+  //  二次贝塞尔曲线
+  quadraticCurvePathVertical(x1, y1, x2, y2) {
+    let cx = x1 + (x2 - x1) * 0.2
+    let cy = y1 + (y2 - y1) * 0.8
+    return `M ${x1},${y1} Q ${cx},${cy} ${x2},${y2}`
+  }
+
+  //  三次贝塞尔曲线
+  // http://wx.karlew.com/canvas/bezier/
+  cubicBezierPathVertical(x1, y1, x2, y2) {
+    let cx1 = x1
+    let cy1 = y2 + (y2 - y1) * 0.3
+    let cx2 = x2
+    let cy2 = y1 + (y2 - y1) * 0.3
+    return `M ${x1},${y1} C ${cx1},${cy1} ${cx2},${cy2} ${x2},${y2}`
+  }
+
   // 根据a,b两个点的位置，计算去除圆角大小后的新的b点
   computeNewPoint(a, b, radius = 0) {
     // x坐标相同
