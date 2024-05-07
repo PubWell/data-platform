@@ -4,8 +4,13 @@
 
       <div class="tool-list flex">
         <!-- v-if="node.uid == 'root'"  -->
-        <div v-if="node?.uid == 'root'" class="item border-r">
+        <div v-if="node?.uid == 'root'" class="item" @click="onChangeLayout('logicalStructure')">
           <el-icon><Operation /></el-icon>
+          <!-- <el-icon style="transform: rotate(-90deg);"><Operation /></el-icon> -->
+        </div>
+        <div v-if="node?.uid == 'root'" class="item border-r" @click="onChangeLayout('organizationStructure')">
+          <!-- <el-icon><Operation /></el-icon> -->
+          <el-icon style="transform: rotate(-90deg);"><Operation /></el-icon>
         </div>
   
         <div class="item" @click="onAddBrother">
@@ -61,13 +66,17 @@ const props = defineProps({
     default: 1
   },
 })
-const emits = defineEmits(['addBrother', 'addChild', 'delete', 'addImage'])
+const emits = defineEmits(['addBrother', 'addChild', 'delete', 'addImage', 'changeLayout'])
 
 onMounted(() => {
 })
 
 const onAddBrother = () => {
   emits('addBrother')
+}
+
+const onAddChild = () => {
+  emits('addChild')
 }
 
 const onDelete = () => {
@@ -82,6 +91,10 @@ const getRect = () => {
   let dom = document.getElementById('tool-wrapper')
   let rect = dom.getBoundingClientRect()
   return rect
+}
+
+const onChangeLayout = (type) => {
+  emits('changeLayout', type)
 }
 
 defineExpose({

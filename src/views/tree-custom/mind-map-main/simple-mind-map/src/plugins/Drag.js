@@ -411,7 +411,6 @@ class Drag extends Base {
     let { prevBrotherOffset, nextBrotherOffset } =
       this.getNodeDistanceToSiblingNode(checkList, node, nodeRect, 'v')
 
-      console.log(prevBrotherOffset, nextBrotherOffset)
     if (nodeRect.left <= x - this.offsetX + this.mousedownNode.width && nodeRect.right >= x - this.offsetX ) {
       // 检测兄弟节点位置
       if (
