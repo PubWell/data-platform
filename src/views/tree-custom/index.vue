@@ -34,7 +34,10 @@
       :isEnd="toolbar.isEnd"
       @back="onBack"
       @next="onNext"
+      @import="onImport"
       @export="onExport"
+      @fit="onFit"
+      @changeLayout="onChangeLayout"
     />
   </div>
 </template>
@@ -48,7 +51,9 @@ import Drag from './mind-map-main/simple-mind-map/src/plugins/Drag.js'
 import Tool from './components/Tool.vue'
 import ContextMenu from './components/ContextMenu.vue'
 import ToolBar from './components/ToolBar.vue'
+import DeviceNode from './components/DeviceNode.vue'
 import { getTextFromHtml } from './mind-map-main/simple-mind-map/src/utils'
+import { createApp } from "vue"
 
 const toolRef = ref(null)
 const tool = reactive({
@@ -79,6 +84,7 @@ const toolbar = reactive({
 const operate = ref(false)
 const dragMark = ref(false)
 const activeNodes = shallowRef([])
+const mindMapLayout = ref('organizationStructure')
 
 let mindMap = null
 MindMap.usePlugin(Drag)
@@ -86,19 +92,31 @@ MindMap.usePlugin(Drag)
 onMounted(() => {
   mindMap = new MindMap({
     el: document.getElementById('mindMapContainer'),
-    layout: 'logicalStructure',
     data: {
       "data": {
         "text": "Root",
-        "uid": "root"
+        "uid": "root",
       },
       "children": [
         {
           "data": {
             "text": "1",
-            "uid": "1"
+            "uid": "1",
+            "type": 'pcs',
+            "status": {
+              "color": "#eeeeee",
+              "text": "offline"
+            },
+            "switch": 0
           },
-          "children": []
+          "children": [
+            {
+              "data": {
+                "text": "4",
+                "uid": "4",
+              }
+            }
+          ]
         },
         {
           "data": {
@@ -116,7 +134,8 @@ onMounted(() => {
         }
       ]
     },
-    initRootNodePosition: ['center', 'center'],
+    // initRootNodePosition: ['30%', '10%'],
+    fit: true,
     enableFreeDrag: true,
     mousewheelAction: 'zoom',
     // 鼠标缩放是否以鼠标当前位置为中心点，否则以画布中心点
@@ -126,10 +145,35 @@ onMounted(() => {
     // 自定义节点的内容
     isUseCustomNodeContent: true,
     customCreateNodeContent: (node) => {
-
+      let el = document.createElement('div')
+      const app = createApp(DeviceNode, {// props
+        node: node.nodeData.data,
+        layout: mindMapLayout.value
+      })
+      app.mount(el)
+      return el
+    },
+    themeConfig: {
+      lineColor: '#C8CCD4',
+      // 曲线（curve）【仅支持logicalStructure、mindMap、verticalTimeline三种结构】、直线（straight）、直连（direct）【仅支持logicalStructure、mindMap、organizationStructure、verticalTimeline四种结构】
+      // 修改源码后，organizationStructure结构可实现curve
+      lineStyle: 'straight',
+      // lineRadius: 10,
+      // 曲线连接时，根节点和其他节点的连接线样式保持统一，默认根节点为 ( 型，其他节点为 { 型，设为true后，都为 { 型。仅支持logicalStructure、mindMap两种结构
+      rootLineKeepSameInCurve: true,
+      root: {
+        fillColor: "transparent",
+      },
+      second: {
+        fillColor: "transparent",
+        borderWidth: 0,
+        marginX: 100,
+        marginY: 200,
+      }
     }
   })
 
+  onChangeLayout(mindMapLayout.value)
   // 监听节点激活事件
   mindMap.on('node_active', onNodeActive)
 
@@ -255,13 +299,14 @@ const showContextMenuWithSvg = (e) => {
 }
 
 const onNodeActive = (node, nodeList) => {
-  if(!operate.value && !dragMark.value && !contextMenu.show && nodeList.length === 1 && node && node.uid === nodeList[0].uid){
-    initTool(node)
-  }else{
-    tool.show = false
-    dragMark.value = false
-    operate.value = false
-  }
+  // if(!operate.value && !dragMark.value && !contextMenu.show && nodeList.length === 1 && node && node.uid === nodeList[0].uid){
+  //   initTool(node)
+  // }else{
+  //   tool.show = false
+  //   dragMark.value = false
+  //   operate.value = false
+  // }
+  console.log(node)
   activeNodes.value = nodeList
 }
 
@@ -316,6 +361,8 @@ const onAddImage = () => {
 
 const onChangeLayout = (e) => {
   mindMap.setLayout(e)
+  mindMap.reRender()
+  mindMapLayout.value = e
 }
 
 // 执行命令
@@ -355,7 +402,7 @@ const onExec = (key, disabled, ...args) => {
       mindMap.export(
         'png',
         true,
-        getTextFromHtml(node.getData('text')),
+        'demo',
         false,
         node
       )
@@ -375,20 +422,28 @@ const stepControl = (index, len) => {
 const onBack = () => {
   if(!toolbar.isStart){
     // 回退一次
-    mindMap.execCommand('BACK')
+    onExec('BACK')
   }
 }
 
 const onNext = () => {
   if(!toolbar.isEnd){
     // 前进一次
-    mindMap.execCommand('FORWARD')
+    onExec('FORWARD')
   }
 }
 
+const onImport = () => {
+  let d = mindMap.getData(true)
+  console.log(d)
+}
+
 const onExport = () => {
-  console.log('export>>>>>>>>>>>>>>>')
-  mindMap.export('png', true, 'demo')
+  onExec('EXPORT_CUR_NODE_TO_PNG')
+}
+
+const onFit = () => {
+  onExec('FIT_CANVAS')
 }
 </script>
 

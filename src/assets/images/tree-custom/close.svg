@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="10px" height="26px" viewBox="0 0 10 26" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>闭合</title>
+    <defs>
+        <path d="M7.5,19.5 L3,2.5" id="path-1"></path>
+    </defs>
+    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="2.9.5实时监控切图" transform="translate(-435.000000, -355.000000)">
+            <g id="闭合" transform="translate(436.000000, 356.500000)">
+                <g id="直线-2备份" stroke-linecap="round" stroke-linejoin="round" transform="translate(5.000000, 11.000000) rotate(180.000000) translate(-5.000000, -11.000000) ">
+                    <use stroke="#FFFFFF" stroke-width="3" xlink:href="#path-1"></use>
+                    <use stroke="#F06464" stroke-width="2" xlink:href="#path-1"></use>
+                </g>
+                <path d="M2.5,5 C3.88071187,5 5,3.88071187 5,2.5 C5,1.11928813 3.88071187,0 2.5,0 C1.11928813,0 0,1.11928813 0,2.5 C0,3.88071187 1.11928813,5 2.5,5 Z" id="路径备份-4" stroke="#F06464" stroke-width="2" fill="#FFFFFF" fill-rule="nonzero" transform="translate(2.500000, 2.500000) rotate(180.000000) translate(-2.500000, -2.500000) "></path>
+                <path d="M2.5,23 C3.88071187,23 5,21.8807119 5,20.5 C5,19.1192881 3.88071187,18 2.5,18 C1.11928813,18 0,19.1192881 0,20.5 C0,21.8807119 1.11928813,23 2.5,23 Z" id="路径备份-6" stroke="#F06464" stroke-width="2" fill="#FFFFFF" fill-rule="nonzero" transform="translate(2.500000, 20.500000) rotate(180.000000) translate(-2.500000, -20.500000) "></path>
+            </g>
+        </g>
+    </g>
+</svg>

@@ -34,14 +34,14 @@
       <template v-for="route in menus" :key="route.path">
         <el-sub-menu v-if="route.children && route.children.length > 0" :index="route.path">
           <template #title>
-            <el-icon><document /></el-icon>
-            <!-- <el-icon><component :is="route.meta.icon"></component></el-icon> -->
+            <!-- <el-icon><document /></el-icon> -->
+            <el-icon><component :is="route.meta.icon"></component></el-icon>
             <span>{{ route.meta.title }}</span>
           </template>
           <template v-for="child in route.children" :key="child.path">
             <el-menu-item :index="child.path">
-              <el-icon><document /></el-icon>
-              <!-- <el-icon><component :is="child.meta.icon"></component></el-icon> -->
+              <!-- <el-icon><document /></el-icon> -->
+              <el-icon><component :is="child.meta.icon"></component></el-icon>
               <template #title>
                 {{ child.meta.title }}
               </template>
@@ -50,8 +50,8 @@
         </el-sub-menu>
         
         <el-menu-item v-else :index="route.path">
-          <el-icon><document /></el-icon>
-          <!-- <el-icon><component :is="child.meta.icon"></component></el-icon> -->
+          <!-- <el-icon><document /></el-icon> -->
+          <el-icon><component :is="child.meta.icon"></component></el-icon>
           <template #title>
             {{ route.meta.title }}
           </template>
@@ -82,7 +82,7 @@ import { useRouter } from 'vue-router'
 
 const isCollapse = ref(true)
 const router = useRouter()
-const menus = ref()
+const menus = shallowRef()
 onMounted(() => {
   let routes = router.getRoutes()
   menus.value = asyncRoutes.sort((a,b) => {

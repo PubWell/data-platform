@@ -12,6 +12,34 @@
           <el-icon><Right /></el-icon>
         </div>
   
+        <div class="item" @click="onChangeLayout('logicalStructure')">
+          <el-icon><Operation /></el-icon>
+        </div>
+
+        <div class="item border-r" @click="onChangeLayout('organizationStructure')">
+          <el-icon style="transform: rotate(-90deg);"><Operation /></el-icon>
+        </div>
+
+        <div class="item">
+          <el-dropdown trigger="click" @command="onChangeLine">
+            <el-button type="primary" plain>
+              <img :src="`@/assets/images/tree-custom/line-${lineActive}.png`" alt="">
+              <el-icon class="el-icon--right"><arrow-down /></el-icon>
+            </el-button>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item v-for="item in lineTypes" :key="item.value" :command="item.value">
+                  <img :src="`@/assets/images/tree-custom/line-${item.value}.png`" alt="">
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
+        </div>
+
+        <div class="item border-r" @click="onFit">
+          <el-icon><FullScreen /></el-icon>
+        </div>
+  
         <div class="item" @click="onImport">
           <el-icon><Download /></el-icon>
         </div>
@@ -31,7 +59,11 @@ import {
   Right,
   Download,
   Upload,
+  FullScreen,
+  Operation,
 } from '@element-plus/icons-vue'
+import CurveImg from '@/assets/images/tree-custom/line-curve.png'
+import StraightImg from '@/assets/images/tree-custom/line-curve.png'
 
 const props = defineProps({
   node: {
@@ -44,10 +76,21 @@ const props = defineProps({
     type: Boolean
   },
 })
-const emits = defineEmits(['back', 'next', 'export', 'import'])
+const emits = defineEmits(['back', 'next', 'fit', 'export', 'import', 'changeLayout'])
+
+const lineActive = ref('curve')
+const lineTypes = shallowRef([
+  {icon: CurveImg, value: 'curve'},
+  {icon: StraightImg, value: 'straight'},
+  // {icon: '', value: 'direct'},
+])
 
 onMounted(() => {
 })
+
+const onChangeLine = (e) => {
+  lineActive.value = e
+}
 
 const onBack = () => {
   emits('back')
@@ -55,6 +98,10 @@ const onBack = () => {
 
 const onNext = () => {
   emits('next')
+}
+
+const onFit = () => {
+  emits('fit')
 }
 
 const onExport = () => {
@@ -65,6 +112,9 @@ const onImport = () => {
   emits('import')
 }
 
+const onChangeLayout = (type) => {
+  emits('changeLayout', type)
+}
 </script>
 
 <style lang="scss" scoped>
