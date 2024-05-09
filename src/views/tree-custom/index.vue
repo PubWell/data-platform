@@ -1,6 +1,42 @@
 <template>
   <div class="wh-100 mind-map-wrapper">
+    <!-- <div class="zoom-level">
+      {{ `${(zoomLevel * 100).toFixed(0)}%` }}<br/>
+      {{ viewInfo }}<br/>
+      {{ `containerW ${viewInfo.containerW}: ${viewInfo.mindMapW} + ${viewInfo.x} = ${viewInfo.mindMapW + viewInfo.x} -> scrollbarX: ${viewInfo.scrollbarX}`  }}<br/>
+      {{ `containerH ${viewInfo.containerH}: ${viewInfo.mindMapH} + ${viewInfo.y} = ${viewInfo.mindMapH + viewInfo.y} -> scrollbarY: ${viewInfo.scrollbarY}`  }}
+    </div> -->
+
     <div id="mindMapContainer"></div>
+
+    <!-- 垂直 -->
+    <div
+      v-show="showVerticalScrollbar"
+      ref="verticalScrollbarRef"
+      class="scrollbar verticalScrollbar"
+      @click="onVerticalScrollbarClick"
+    >
+      <div
+          class="scrollbarInner"
+          :style="verticalScrollbarStyle"
+          @click.stop
+          @mousedown="onVerticalScrollbarMousedown"
+      ></div>
+    </div>
+
+    <!-- 水平 -->
+    <div
+      v-show="showHorizontalScrollbar"
+      ref="horizontalScrollbarRef"
+      class="scrollbar horizontalScrollbar"
+      @click="onHorizontalScrollbarClick">
+      <div
+          class="scrollbarInner"
+          :style="horizontalScrollbarStyle"
+          @click.stop
+          @mousedown="onHorizontalScrollbarMousedown"
+      ></div>
+    </div>
 
     <Tool
       v-if="tool.show"
@@ -32,12 +68,22 @@
     <ToolBar
       :isStart="toolbar.isStart"
       :isEnd="toolbar.isEnd"
+      :scale="zoomLevel"
       @back="onBack"
       @next="onNext"
       @import="onImport"
       @export="onExport"
       @fit="onFit"
       @changeLayout="onChangeLayout"
+      @changeLine="onChangeLine"
+      @changeScale="onChangeScale"
+    />
+
+    <Edit
+      v-if="edit.show"
+      ref="editRef"
+      :node="edit.node"
+      @update-node="onUpdateNode"
     />
   </div>
 </template>
@@ -47,13 +93,18 @@ import { ref, onMounted, shallowRef } from 'vue'
 // https://wanglin2.github.io/mind-map/#/doc/zh/course2
 import MindMap from "./mind-map-main/simple-mind-map"
 import Drag from './mind-map-main/simple-mind-map/src/plugins/Drag.js'
+import ExportPDF from './mind-map-main/simple-mind-map/src/plugins/ExportPDF.js'
+import Export from './mind-map-main/simple-mind-map/src/plugins/Export.js'
+import Scrollbar from './mind-map-main/simple-mind-map/src/plugins/Scrollbar.js'
 
 import Tool from './components/Tool.vue'
+import Edit from './components/Edit.vue'
 import ContextMenu from './components/ContextMenu.vue'
 import ToolBar from './components/ToolBar.vue'
-import DeviceNode from './components/DeviceNode.vue'
+import DeviceNode from './components/device-node/index.vue'
 import { getTextFromHtml } from './mind-map-main/simple-mind-map/src/utils'
 import { createApp } from "vue"
+import { themeConfig, data } from './components/hooks.js'
 
 const toolRef = ref(null)
 const tool = reactive({
@@ -81,63 +132,66 @@ const toolbar = reactive({
   isStart: true,
   isEnd: true,
 })
+const edit = reactive({
+  show: false,
+  node: null
+})
 const operate = ref(false)
 const dragMark = ref(false)
 const activeNodes = shallowRef([])
 const mindMapLayout = ref('organizationStructure')
+const mindMapData = ref()
+const initPos = ['center', '10%']
+
+const showVerticalScrollbar = ref(false)
+const showHorizontalScrollbar = ref(false)
+const verticalScrollbarRef = ref(null)
+const horizontalScrollbarRef = ref(null)
+const verticalScrollbarStyle = ref({
+  top: 0,
+  height: 0
+})
+const horizontalScrollbarStyle = ref({
+  left: 0,
+  width: 0
+})
+const zoomLevel = ref(1)
+const viewInfo = reactive({
+  containerW: 0,
+  containerH: 0,
+  mindMapW: 0,
+  mindMapH: 0,
+  scrollMapW: 0,
+  scrollMapH: 0
+})
 
 let mindMap = null
 MindMap.usePlugin(Drag)
+  .usePlugin(ExportPDF)
+  .usePlugin(Export)
+  .usePlugin(Scrollbar)
 
 onMounted(() => {
   mindMap = new MindMap({
     el: document.getElementById('mindMapContainer'),
-    data: {
-      "data": {
-        "text": "Root",
-        "uid": "root",
-      },
-      "children": [
-        {
-          "data": {
-            "text": "1",
-            "uid": "1",
-            "type": 'pcs',
-            "status": {
-              "color": "#eeeeee",
-              "text": "offline"
-            },
-            "switch": 0
-          },
-          "children": [
-            {
-              "data": {
-                "text": "4",
-                "uid": "4",
-              }
-            }
-          ]
-        },
-        {
-          "data": {
-            "text": "2",
-            "uid": "2"
-          },
-          "children": []
-        },
-        {
-          "data": {
-            "text": "3",
-            "uid": "3"
-          },
-          "children": []
-        }
-      ]
-    },
-    // initRootNodePosition: ['30%', '10%'],
-    fit: true,
-    enableFreeDrag: true,
+    layout: mindMapLayout.value,
+    data: {...data},
+    initRootNodePosition: initPos,
+    // fit: true,
+    alwaysShowExpandBtn: true,
+    enableFreeDrag: false,
+    scaleRatio: 0.05,
+    // 自定义鼠标滚轮事件处理，可以传一个函数，回调参数为事件对象
+    // customHandleMousewheel: () => {
+    //   return false
+    // },
     mousewheelAction: 'zoom',
+    // 是否禁止鼠标滚轮缩放
+    // disableMouseWheelZoom: true,
+    // 是否禁止拖动画布
+    // isDisableDrag: true,
+    // 当注册了滚动条插件（Scrollbar）时，是否将思维导图限制在画布内
+    isLimitMindMapInCanvasWhenHasScrollbar: false,
     // 鼠标缩放是否以鼠标当前位置为中心点，否则以画布中心点
     mouseScaleCenterUseMousePosition: true,
     // 当mousewheelAction设为zoom时，或者按住Ctrl键时，默认向前滚动是缩小，向后滚动是放大，如果该属性设为true，那么会反过来
@@ -154,39 +208,15 @@ onMounted(() => {
       return el
     },
     themeConfig: {
-      lineColor: '#C8CCD4',
-      // 曲线（curve）【仅支持logicalStructure、mindMap、verticalTimeline三种结构】、直线（straight）、直连（direct）【仅支持logicalStructure、mindMap、organizationStructure、verticalTimeline四种结构】
-      // 修改源码后，organizationStructure结构可实现curve
-      lineStyle: 'straight',
-      // lineRadius: 10,
-      // 曲线连接时，根节点和其他节点的连接线样式保持统一，默认根节点为 ( 型，其他节点为 { 型，设为true后，都为 { 型。仅支持logicalStructure、mindMap两种结构
-      rootLineKeepSameInCurve: true,
-      root: {
-        fillColor: "transparent",
-      },
-      second: {
-        fillColor: "transparent",
-        borderWidth: 0,
-        marginX: 100,
-        marginY: 200,
-      }
+      ...themeConfig
     }
   })
 
-  onChangeLayout(mindMapLayout.value)
   // 监听节点激活事件
   mindMap.on('node_active', onNodeActive)
 
   // 监听draw拖拽事件
-  mindMap.on('drag', (e, t) => {
-    // if(activeNodes.value.length){
-    //   dragMark.value = true
-    // }
-
-    // mindMap.renderer.closeHighlightNode()
-    // mindMap.renderer.clearActiveNode()
-  })
-
+  // mindMap.on('drag', (e) => {})
   // // 监听node拖拽事件
   // mindMap.on('node_dragging', (e, t) => {
   //   console.log('node_dragging>>>>>>>>>')
@@ -195,6 +225,8 @@ onMounted(() => {
   // mindMap.on('node_dragend', (e, t) => {
   //   console.log('node_dragend>>>>>>>>>')
   // })
+
+  mindMap.on('view_data_change', mindMapViewChange)
 
   mindMap.on('node_contextmenu', showContextMenuWithNode)
   mindMap.on('node_click', hideContextMenu)
@@ -206,9 +238,18 @@ onMounted(() => {
   mindMap.on('mouseup', onMouseup)
 
   mindMap.on('back_forward', stepControl)
+
+  window.addEventListener('resize', resizeHandler)
+
+  // 如果容器大小发生了改变需要再次调用该方法
+  // initScrollbar()
+  
+  // 监听scrollbar_change方法来获取滚动条大小和位置数据
+  mindMap.on('scrollbar_change', updateScrollbar)
 })
 
 onBeforeUnmount(() => {
+  mindMap.off('view_data_change', mindMapViewChange)
   // 取消事件监听
   mindMap.off('node_active', onNodeActive)
 
@@ -222,7 +263,96 @@ onBeforeUnmount(() => {
   mindMap.off('mouseup', onMouseup)
 
   mindMap.off('back_forward', stepControl)
+
+  window.removeEventListener('resize', resizeHandler)
+
+  mindMap.off('scrollbar_change', updateScrollbar)
+  mindMap.destroy()
 })
+
+const mindMapViewChange = () => {
+  zoomLevel.value = mindMap.getSvgData().scaleX
+  // initScrollbar()
+}
+
+const resizeHandler = () => {
+  mindMap.resize()
+  onExec('FIT_CANVAS')
+  // initScrollbar()
+}
+
+const initScrollbar = () => {
+  setTimeout(() => {
+    let dom = document.getElementById('mindMapContainer'), {width: containerW, height: containerH} = dom.getBoundingClientRect()
+    let cfg = mindMap.getSvgData(), {width: mindMapW, height: mindMapH} = cfg.rect
+    let width = containerW, height = containerH
+    // console.log(cfg)
+    // console.log(containerW, containerH, cfg)
+    showHorizontalScrollbar.value = false
+    showVerticalScrollbar.value = false
+
+    if(mindMapW * cfg.scaleX > containerW){
+      showHorizontalScrollbar.value = true
+      // 水平滚动条容器的宽度
+      width = horizontalScrollbarRef.value.getBoundingClientRect().width
+    }
+    if(mindMapH * cfg.scaleY > containerH){
+      showVerticalScrollbar.value = true
+      // 垂直滚动条容器的高度
+      height = horizontalScrollbarRef.value.getBoundingClientRect().height
+    }
+    viewInfo.containerW = containerW
+    viewInfo.containerH = containerH
+    viewInfo.mindMapW = mindMapW * cfg.scaleX
+    viewInfo.mindMapH = mindMapH * cfg.scaleY
+    viewInfo.scrollMapW = width
+    viewInfo.scrollMapH = height
+    viewInfo.scale = cfg.scaleX
+    viewInfo.x = cfg.rect.x
+    viewInfo.y = cfg.rect.y
+    viewInfo.scrollbarX = mindMapW * cfg.scaleX + cfg.rect.x > containerW
+    viewInfo.scrollbarY = mindMapH * cfg.scaleY + cfg.rect.y > containerH
+
+    mindMap.scrollbar.setScrollBarWrapSize(mindMapW, mindMapH)
+  }, 100);
+}
+
+const updateScrollbar = (data) => {
+  const {
+    vertical,
+    horizontal
+  } = data
+  verticalScrollbarStyle.value = {
+    top: vertical.top + '%',
+    height: vertical.height + '%'
+  }
+  horizontalScrollbarStyle.value = {
+    left: horizontal.left + '%',
+    width: horizontal.width + '%'
+  }
+}
+
+// 给滚动条元素绑定mousedown事件，并且调用插件的onMousedown方法,这样就能实现鼠标拖动滚动条更新画布位置的功能
+const onVerticalScrollbarMousedown = (e) => {
+  // 垂直滚动条元素
+  mindMap.scrollbar.onMousedown(e, 'vertical')
+}
+
+const onHorizontalScrollbarMousedown = (e) => {
+  // 水平滚动条元素
+  mindMap.scrollbar.onMousedown(e, 'horizontal')
+}
+
+// 如果还需要实现点击滚动条容器元素实现滚动条位置的跳变功能，那么需要给滚动条元素绑定点击事件，并且调用插件的onClick方法
+const onVerticalScrollbarClick = (e) => {
+  // 垂直滚动条元素
+  mindMap.scrollbar.onClick(e, 'vertical')
+}
+
+const onHorizontalScrollbarClick = (e) => {
+  // 水平滚动条元素
+  mindMap.scrollbar.onClick(e, 'horizontal')
+}
 
 const getContextMenuPosition = (x, y) => {
   let contextMenuRect = contextMenuRef.value.getRect()
@@ -299,14 +429,17 @@ const showContextMenuWithSvg = (e) => {
 }
 
 const onNodeActive = (node, nodeList) => {
-  // if(!operate.value && !dragMark.value && !contextMenu.show && nodeList.length === 1 && node && node.uid === nodeList[0].uid){
-  //   initTool(node)
-  // }else{
-  //   tool.show = false
-  //   dragMark.value = false
-  //   operate.value = false
-  // }
-  console.log(node)
+  if(!operate.value && !dragMark.value && !contextMenu.show && nodeList.length === 1 && node && node.uid === nodeList[0].uid){
+    // initTool(node)
+    initEdit(node)
+  }else{
+    tool.show = false
+    dragMark.value = false
+    operate.value = false
+
+    edit.show = false
+
+  }
   activeNodes.value = nodeList
 }
 
@@ -332,21 +465,41 @@ const initTool = (node) => {
   })
 }
 
+const initEdit = (node) => {
+  edit.node = node
+  edit.show = true
+}
+
+const onUpdateNode = (e) => {
+  let data = {
+    ...edit.node.nodeData.data,
+    [e.key]: e.value
+  }
+
+  // activeNodes.value[0].setData(data)
+  // mindMapData.value = mindMap.getData(true)
+  // mindMap.setFullData(mindMapData.value)
+
+  if(e.key == 'text'){
+    activeNodes.value[0].setText(e.value)
+  }else{
+    activeNodes.value[0].setData(data)
+    activeNodes.value[0].render()
+  }
+}
+
 const onAddBrother = () => {
   operate.value = true
-  // mindMap.execCommand('INSERT_NODE', false)
   onExec('INSERT_NODE', false, false)
 }
 
 const onAddChild = () => {
   operate.value = true
-  // mindMap.execCommand('INSERT_CHILD_NODE', false)
   onExec('INSERT_CHILD_NODE', false, false)
 }
 
 const onDelete = () => {
   operate.value = true
-  // mindMap.execCommand('REMOVE_NODE', false)
   onExec('REMOVE_NODE', false, false)
 }
 
@@ -360,9 +513,25 @@ const onAddImage = () => {
 }
 
 const onChangeLayout = (e) => {
+  mindMapLayout.value = e
   mindMap.setLayout(e)
   mindMap.reRender()
-  mindMapLayout.value = e
+  setTimeout(() => {
+    onExec('FIT_CANVAS')
+    // initScrollbar()
+  }, 50)
+}
+
+const onChangeLine = (e) => {
+  let cfg = {
+    ...themeConfig,
+    lineStyle: e,
+  }
+  mindMap.setThemeConfig(cfg, false)
+}
+
+const onChangeScale = (e) => {
+  mindMap.view.setScale(e)
 }
 
 // 执行命令
@@ -412,6 +581,7 @@ const onExec = (key, disabled, ...args) => {
       break
   }
   contextMenu.show = false
+  // initScrollbar()
 }
 
 const stepControl = (index, len) => {
@@ -434,12 +604,17 @@ const onNext = () => {
 }
 
 const onImport = () => {
-  let d = mindMap.getData(true)
-  console.log(d)
+  mindMap.setFullData(mindMapData.value)
+  // initScrollbar()
 }
 
 const onExport = () => {
-  onExec('EXPORT_CUR_NODE_TO_PNG')
+  let cfg = mindMap.getSvgData()
+  console.log(cfg)
+  mindMapData.value = mindMap.getData(true)
+  console.log(mindMapData.value)
+  mindMap.clearDraw()
+  // onExec('EXPORT_CUR_NODE_TO_PNG')
 }
 
 const onFit = () => {
@@ -447,11 +622,17 @@ const onFit = () => {
 }
 </script>
 
-<style >
+<style lang="scss">
   /* @import "simpleMindMap.esm.css"; */
   
   .mind-map-wrapper{
     position: relative;
+    .zoom-level{
+      position: absolute;
+      z-index: 20;
+      left: 30px;
+      top: 30px;
+    }
   }
   #mindMapContainer {
     position: absolute;
@@ -464,5 +645,37 @@ const onFit = () => {
   #mindMapContainer * {
     margin: 0;
     padding: 0;
+  }
+  .scrollbar {
+    position: relative;
+    background-color: #f5f5f5;
+    border-radius: 10px;
+    overflow: hidden;
+
+    &.verticalScrollbar {
+      width: 10px;
+      height: 100%;
+
+      .scrollbarInner {
+        width: 10px;
+        left: 0;
+      }
+    }
+
+    &.horizontalScrollbar {
+      width: 100%;
+      height: 10px;
+
+      .scrollbarInner {
+        height: 10px;
+        top: 0;
+      }
+    }
+
+    .scrollbarInner {
+      position: absolute;
+      background-color: #ccc;
+      border-radius: 10px;
+    }
   }
 </style>

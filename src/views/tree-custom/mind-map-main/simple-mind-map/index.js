@@ -376,7 +376,6 @@ class MindMap {
   //  导出
   async export(...args) {
     try {
-      console.log(...args, this.doExport)
       let result = await this.doExport.export(...args)
       return result
     } catch (error) {

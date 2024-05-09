@@ -2,13 +2,13 @@
   <div class="device-node-wrapper">
     <div class="device-node-box" :class="{'flex': layout == 'logicalStructure', 'flex-column': layout == 'organizationStructure'}">
 
-      <template v-if="node.uid === 'root'">
+      <template v-if="node.type === 'root'">
         <div class="device-root">
           <img class="root-icon" src="@/assets/images/tree-custom/station-icon.svg" alt="">
         </div>
       </template>
 
-      <template v-if="node.uid !== 'root'">
+      <template v-if="node.type == 'pcs'">
         <div class="switch-box" :class="{'horizontal': layout == 'logicalStructure'}">
           <img class="icon" src="@/assets/images/tree-custom/close.svg" alt="">
         </div>
@@ -36,13 +36,23 @@
         </div>
       </template>
 
-      <div class="device-bcc"></div>
+      <template v-if="node.type == 'bcc'">
+        <div class="device-bcc flex-column">
+          <Switch :status="1" />
+          <Battery :percent="30" class="battery" :status="1" />
+          <div class="device-name">{{ node.text }}</div>
+          <!-- <div class="device-item flex-column">
+          </div> -->
+        </div>
+      </template>
 
     </div>
   </div>
 </template>
 
 <script setup>
+import Battery from './Battery.vue';
+import Switch from './Switch.vue';
 const props = defineProps({
   deviceInfo: {
     type: Object,
@@ -140,11 +150,18 @@ onMounted(() => {
           word-break: keep-all;
         }
       }
-      .device-name{
-        margin-top: 12px !important;
-        font-size: 18px;
-        font-weight: bold;
-      }
+    }
+    .device-name{
+      margin-top: 12px !important;
+      font-size: 18px;
+      font-weight: bold;
+    }
+    .device-bcc{
+      align-items: center;
+      padding: 0 10px !important;
+      background-color: #ffffff;
+      border-radius: 8px;
+      border: 1px solid #C8CCD4;
     }
   }
 }

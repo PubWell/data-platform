@@ -3,12 +3,11 @@
     <div id="tool-wrapper" class="tool-box">
 
       <div class="tool-list flex">
-        <!-- v-if="node.uid == 'root'"  -->
-        <div v-if="node?.uid == 'root'" class="item" @click="onChangeLayout('logicalStructure')">
+        <div v-if="node?.type == 'root'" class="item" @click="onChangeLayout('logicalStructure')">
           <el-icon><Operation /></el-icon>
           <!-- <el-icon style="transform: rotate(-90deg);"><Operation /></el-icon> -->
         </div>
-        <div v-if="node?.uid == 'root'" class="item border-r" @click="onChangeLayout('organizationStructure')">
+        <div v-if="node?.type == 'root'" class="item border-r" @click="onChangeLayout('organizationStructure')">
           <!-- <el-icon><Operation /></el-icon> -->
           <el-icon style="transform: rotate(-90deg);"><Operation /></el-icon>
         </div>

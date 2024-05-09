@@ -1,4 +1,4 @@
-import { ScaleToOriginal, CollectionTag, Grid } from '@element-plus/icons-vue'
+import { Operation, CollectionTag, Grid } from '@element-plus/icons-vue'
 
 const Layout = () => import('@/layout/index.vue')
 
@@ -10,7 +10,7 @@ export default {
   meta: {
     order: 5,
     title: '自定义绘图',
-    icon: Grid
+    icon: Operation
   },
   children: [
     {
@@ -20,7 +20,7 @@ export default {
       meta: {
         title: '自定义绘图',
         order: 1,
-        icon: Grid
+        icon: Operation
       },
     },
   ]

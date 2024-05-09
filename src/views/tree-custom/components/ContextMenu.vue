@@ -8,7 +8,7 @@
     <template v-if="type === 'node'">
       <div
         class="item"
-        @click="exec('INSERT_NODE', insertNodeBtnDisabled, false)"
+        @click="exec('INSERT_NODE', insertNodeBtnDisabled, false, [], {...node.nodeData.data, uid: new Date().getTime()})"
         :class="{ disabled: insertNodeBtnDisabled }"
       >
         <span class="name">插入同级节点</span>
@@ -16,7 +16,7 @@
       </div>
       <div
         class="item"
-        @click="exec('INSERT_CHILD_NODE', false, false)"
+        @click="exec('INSERT_CHILD_NODE', false, false, [], {...node.nodeData.data, uid: new Date().getTime()})"
         :class="{ disabled: isGeneralization }"
       >
         <span class="name">插入子级节点</span>
@@ -24,7 +24,7 @@
       </div>
       <div
         class="item"
-        @click="exec('INSERT_PARENT_NODE', false, false)"
+        @click="exec('INSERT_PARENT_NODE', false, false, [], {...node.nodeData.data, uid: new Date().getTime()})"
         :class="{ disabled: insertNodeBtnDisabled }"
       >
         <span class="name">插入父节点</span>
@@ -91,9 +91,9 @@
       <!-- <div class="item" @click="exec('REMOVE_CUSTOM_STYLES')">
         <span class="name">一键去除自定义样式</span>
       </div> -->
-      <div class="item" @click="exec('EXPORT_CUR_NODE_TO_PNG')">
+      <!-- <div class="item" @click="exec('EXPORT_CUR_NODE_TO_PNG')">
         <span class="name">导出该节点为图片</span>
-      </div>
+      </div> -->
     </template>
     <template v-if="type === 'svg'">
       <div class="item" @click="exec('RETURN_CENTER')">
