@@ -5,11 +5,11 @@
       <div class="tool-list flex">
   
         <div class="item" @click="onBack" :class="{'disable': isStart}">
-          <el-icon><Back /></el-icon>
+          <el-icon :size="20" ><Back /></el-icon>
         </div>
   
         <div class="item border-r" @click="onNext" :class="{'disable': isEnd}">
-          <el-icon><Right /></el-icon>
+          <el-icon :size="20" ><Right /></el-icon>
         </div>
 
         <!-- <div class="item" :class="{'active': layoutActive == 'logicalStructure'}" @click="onChangeLayout('logicalStructure')">
@@ -62,8 +62,17 @@
           </el-dropdown> -->
         <!-- </div> -->
 
+        <div class="item border-r" @click="updateLineAnimation">
+          <el-icon :size="20" v-if="!lineAnimation"><VideoPlay /></el-icon>
+          <el-icon :size="20" v-else><VideoPause /></el-icon>
+        </div>
+
+        <div class="item border-r" @click="updateMode" :class="{'disable': !editable}">
+          <el-icon :size="20"><Edit /></el-icon>
+        </div>
+
         <div class="item" @click="onFit">
-          <el-icon><FullScreen /></el-icon>
+          <el-icon :size="20"><FullScreen /></el-icon>
         </div>
         
         <div class="item" @click="updateScale('minus')">
@@ -87,11 +96,11 @@
         </div> -->
   
         <div class="item" @click="onImport">
-          <el-icon><Download /></el-icon>
+          <el-icon :size="20"><Download /></el-icon>
         </div>
   
         <div class="item" @click="onExport">
-          <el-icon><Upload /></el-icon>
+          <el-icon :size="20"><Upload /></el-icon>
         </div>
       </div>
     </div>
@@ -111,6 +120,9 @@ import {
   Search,
   Plus,
   Minus,
+  Edit,
+  VideoPause,
+  VideoPlay,
 } from '@element-plus/icons-vue'
 import CurveImg from '@/assets/images/tree-custom/line-curve.png'
 import StraightImg from '@/assets/images/tree-custom/line-straight.png'
@@ -132,7 +144,7 @@ const props = defineProps({
     type: Number
   },
 })
-const emits = defineEmits(['back', 'next', 'fit', 'export', 'import', 'changeLayout', 'changeLine', 'changeScale'])
+const emits = defineEmits(['back', 'next', 'fit', 'export', 'import', 'changeLayout', 'changeLine', 'changeScale', 'changeMode', 'changeThemeConfig'])
 
 const layoutActive = ref('organizationStructure')
 const layoutTypes = ref([
@@ -145,11 +157,10 @@ const lineTypes = shallowRef([
   {icon: StraightImg, value: 'straight'},
   {icon: DirectImg, value: 'direct'},
 ])
+const editable = ref(true)
+const lineAnimation = ref(true)
 
 onMounted(() => {
-  setTimeout(() => {
-    onChangeLine(lineActive.value)
-  }, 100);
 })
 
 const onChangeLine = (e) => {
@@ -188,6 +199,19 @@ const updateScale = (type) => {
   }else{
     emits('changeScale', props.scale + 0.05)
   }
+}
+
+const updateMode = () => {
+  editable.value = !editable.value
+  emits('changeMode', editable.value)
+}
+
+const updateLineAnimation = () => {
+  lineAnimation.value = !lineAnimation.value
+  emits('changeThemeConfig', {
+    key: 'lineAnimation',
+    value: lineAnimation.value
+  })
 }
 </script>
 

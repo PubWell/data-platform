@@ -17,13 +17,13 @@
       >
         <template v-for="(item, index) in tableHeader" :key="item.field">
         
-          <el-table-column v-if="item.field == 'order'" width="100" :label="item.label">{{ index+1 }}</el-table-column>
+          <el-table-column v-if="item.field == 'order'" :width="100" :label="item.label">{{ index+1 }}</el-table-column>
           
-          <el-table-column v-else-if="item.field == 'action'" width="200" :label="item.label">
+          <el-table-column v-else-if="item.field == 'action'" :width="300" :label="item.label">
             <!-- <el-button type="primary">发布</el-button> -->
-            <el-button text :icon="EditPen"/>
-            <el-button text :icon="UploadFilled"/>
-            <el-button text :icon="Delete"/>
+            <el-button text :icon="EditPen" @click="onEdit">编辑</el-button>
+            <el-button text :icon="UploadFilled">发布</el-button>
+            <el-button text :icon="Delete">删除</el-button>
           </el-table-column>
 
           <el-table-column
@@ -40,6 +40,9 @@
 
 <script setup>
 import { Search, EditPen, Delete, UploadFilled } from '@element-plus/icons-vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 const keyword = ref()
 const tableData = ref([
@@ -54,6 +57,10 @@ const tableHeader = ref([
   { field: 'createdTime', label: '创建时间' },
   { field: 'action', label: '操作' },
 ])
+
+const onEdit = () => {
+  router.push('/custom-layout/index')
+}
 </script>
 
 <style lang="scss" scoped>

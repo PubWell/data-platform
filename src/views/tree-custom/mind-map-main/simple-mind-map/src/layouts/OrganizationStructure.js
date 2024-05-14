@@ -250,6 +250,12 @@ class OrganizationStructure extends Base {
         : ''
       let path = `M ${x2},${y1 + s1} L ${x2},${y2}` + nodeUseLineStylePath
       this.setLineStyle(style, lines[index], path, item)
+      // 水平线
+      let lin2 = this.lineDraw.path()
+      node.style.line(lin2)
+      lin2.plot(this.transformPath(`M ${x1},${y1 + s1} L ${x2},${y1 + s1}`))
+      node._lines.push(lin2)
+      style && style(lin2, node)
     })
     minx = Math.min(x1, minx)
     maxx = Math.max(x1, maxx)
@@ -263,13 +269,13 @@ class OrganizationStructure extends Base {
     node._lines.push(line1)
     style && style(line1, node)
     // 水平线
-    if (len > 0) {
-      let lin2 = this.lineDraw.path()
-      node.style.line(lin2)
-      lin2.plot(this.transformPath(`M ${minx},${y1 + s1} L ${maxx},${y1 + s1}`))
-      node._lines.push(lin2)
-      style && style(lin2, node)
-    }
+    // if (len > 0) {
+    //   let lin2 = this.lineDraw.path()
+    //   node.style.line(lin2)
+    //   lin2.plot(this.transformPath(`M ${minx},${y1 + s1} L ${maxx},${y1 + s1}`))
+    //   node._lines.push(lin2)
+    //   style && style(lin2, node)
+    // }
   }
 
   //  渲染按钮

@@ -164,31 +164,31 @@ class Drag extends Base {
         this.nextNode
       )
     }
-    // else if (
-    //   this.clone &&
-    //   this.mindMap.opt.enableFreeDrag &&
-    //   this.beingDragNodeList.length === 1
-    // ) {
-    //   // 如果只拖拽了一个节点，那么设置自定义位置
-    //   let { x, y } = this.mindMap.toPos(
-    //     e.clientX - this.offsetX,
-    //     e.clientY - this.offsetY
-    //   )
-    //   let { scaleX, scaleY, translateX, translateY } = this.drawTransform
-    //   x = (x - translateX) / scaleX
-    //   y = (y - translateY) / scaleY
-    //   this.mousedownNode.left = x
-    //   this.mousedownNode.top = y
-    //   this.mousedownNode.customLeft = x
-    //   this.mousedownNode.customTop = y
-    //   this.mindMap.execCommand(
-    //     'SET_NODE_CUSTOM_POSITION',
-    //     this.mousedownNode,
-    //     x,
-    //     y
-    //   )
-    //   this.mindMap.render()
-    // }
+    else if (
+      this.clone &&
+      this.mindMap.opt.enableFreeDrag &&
+      this.beingDragNodeList.length === 1
+    ) {
+      // 如果只拖拽了一个节点，那么设置自定义位置
+      let { x, y } = this.mindMap.toPos(
+        e.clientX - this.offsetX,
+        e.clientY - this.offsetY
+      )
+      let { scaleX, scaleY, translateX, translateY } = this.drawTransform
+      x = (x - translateX) / scaleX
+      y = (y - translateY) / scaleY
+      this.mousedownNode.left = x
+      this.mousedownNode.top = y
+      this.mousedownNode.customLeft = x
+      this.mousedownNode.customTop = y
+      this.mindMap.execCommand(
+        'SET_NODE_CUSTOM_POSITION',
+        this.mousedownNode,
+        x,
+        y
+      )
+      this.mindMap.render()
+    }
     if (this.isDragging) {
       this.mindMap.emit('node_dragend', {
         overlapNodeUid,

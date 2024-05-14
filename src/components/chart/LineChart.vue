@@ -218,7 +218,7 @@ const setTooltip = () => {
     trigger: 'axis',
     formatter: (params) => {
       let html = `
-          <div style="max-height:400px;overflow:scroll; font-size: 12px">
+          <div style="max-height:400px;overflow:auto; font-size: 12px">
           <div style="margin-bottom:5px; color: #73769F">${formatDate(new Date(+params[0].axisValue), 'yyyy-MM-dd hh:mm:ss')}</div>
         `
       for (let i = 0; i < params.length; i++) {

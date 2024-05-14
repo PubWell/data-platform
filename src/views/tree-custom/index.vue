@@ -77,6 +77,8 @@
       @changeLayout="onChangeLayout"
       @changeLine="onChangeLine"
       @changeScale="onChangeScale"
+      @changeMode="onChangeMode"
+      @changeThemeConfig="onChangeThemeConfig"
     />
 
     <Edit
@@ -84,11 +86,13 @@
       ref="editRef"
       :node="edit.node"
       @update-node="onUpdateNode"
+      @exec-command="onExec"
     />
   </div>
 </template>
 
 <script setup>
+// https://svgjs.dev/docs/3.0/animating/#orchestrate-animations
 import { ref, onMounted, shallowRef } from 'vue'
 // https://wanglin2.github.io/mind-map/#/doc/zh/course2
 import MindMap from "./mind-map-main/simple-mind-map"
@@ -246,6 +250,10 @@ onMounted(() => {
   
   // 监听scrollbar_change方法来获取滚动条大小和位置数据
   mindMap.on('scrollbar_change', updateScrollbar)
+
+  mindMap.on('expand_btn_click', (e) => {
+    console.log(e)
+  })
 })
 
 onBeforeUnmount(() => {
@@ -277,7 +285,7 @@ const mindMapViewChange = () => {
 
 const resizeHandler = () => {
   mindMap.resize()
-  onExec('FIT_CANVAS')
+  // onExec('FIT_CANVAS')
   // initScrollbar()
 }
 
@@ -429,7 +437,7 @@ const showContextMenuWithSvg = (e) => {
 }
 
 const onNodeActive = (node, nodeList) => {
-  if(!operate.value && !dragMark.value && !contextMenu.show && nodeList.length === 1 && node && node.uid === nodeList[0].uid){
+  if(!contextMenu.show && nodeList.length === 1 && node && node.uid === nodeList[0].uid){
     // initTool(node)
     initEdit(node)
   }else{
@@ -471,10 +479,10 @@ const initEdit = (node) => {
 }
 
 const onUpdateNode = (e) => {
-  let data = {
-    ...edit.node.nodeData.data,
-    [e.key]: e.value
-  }
+  // let data = {
+  //   ...edit.node.nodeData.data,
+  //   [e.key]: e.value
+  // }
 
   // activeNodes.value[0].setData(data)
   // mindMapData.value = mindMap.getData(true)
@@ -483,9 +491,24 @@ const onUpdateNode = (e) => {
   if(e.key == 'text'){
     activeNodes.value[0].setText(e.value)
   }else{
-    activeNodes.value[0].setData(data)
-    activeNodes.value[0].render()
+    // activeNodes.value[0].setData(data)
+    // activeNodes.value[0].updateNodeShape()
+    // activeNodes.value[0].render()
+
+    // mindMap.reRender()
+    mindMap.execCommand('SET_NODE_DATA', activeNodes.value[0], {[e.key]: e.value})
   }
+}
+
+const onChangeThemeConfig = (e) => {
+
+
+  let cfg = {
+    ...themeConfig,
+    [e.key]: e.value,
+  }
+
+  mindMap.setThemeConfig(cfg, false)
 }
 
 const onAddBrother = () => {
@@ -531,9 +554,18 @@ const onChangeLine = (e) => {
 }
 
 const onChangeScale = (e) => {
-  mindMap.view.setScale(e)
+  mindMap.view.setScale(e, 'center', 'center')
 }
 
+const onChangeMode = (e) => {
+  let mode = e ? 'edit' : 'readonly'
+  mindMap.setMode(mode)
+  // onFit()
+  mindMap.updateConfig({
+    isDisableDrag: e ? false : true,
+    disableMouseWheelZoom: e ? false : true
+  })
+}
 // 执行命令
 const onExec = (key, disabled, ...args) => {
   if (disabled) {

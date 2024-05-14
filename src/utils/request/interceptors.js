@@ -13,7 +13,7 @@ export function reqResolve(config) {
     return config
   }
 
-  // const token = "ae6beb04-9a22-4010-b67d-22aa70bd75a3"
+  // const token = "7342eeaa-e86c-4bc2-baf3-69b929bb6cde"
   const token = getToken()
   if (!token) {
     return Promise.reject({ code: 401, message: '登录已过期，请重新登录！' })

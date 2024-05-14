@@ -3,16 +3,16 @@
     <div class="device-node-box" :class="{'flex': layout == 'logicalStructure', 'flex-column': layout == 'organizationStructure'}">
 
       <template v-if="node.type === 'root'">
-        <div class="device-root">
+        <div class="node device-root">
           <img class="root-icon" src="@/assets/images/tree-custom/station-icon.svg" alt="">
         </div>
       </template>
 
-      <template v-if="node.type == 'pcs'">
+      <template v-else-if="node.type == 'pcs'">
         <div class="switch-box" :class="{'horizontal': layout == 'logicalStructure'}">
           <img class="icon" src="@/assets/images/tree-custom/close.svg" alt="">
         </div>
-        <div class="device-item">
+        <div class="node device-pcs">
   
           <div class="flex">
             <div class="device-icon">
@@ -25,7 +25,7 @@
             </div>
           </div>
   
-          <div class="device-name">{{ node.text }}</div>
+          <div class="device-name mt-10">{{ node.text }}</div>
   
           <!-- <div>
             <el-input v-model="inputVal"/>
@@ -36,13 +36,19 @@
         </div>
       </template>
 
-      <template v-if="node.type == 'bcc'">
-        <div class="device-bcc flex-column">
+      <template v-else-if="node.type == 'bcc'">
+        <div class="node device-bcc flex-column">
           <Switch :status="1" />
           <Battery :percent="30" class="battery" :status="1" />
-          <div class="device-name">{{ node.text }}</div>
+          <div class="device-name mt-10">{{ node.text }}</div>
           <!-- <div class="device-item flex-column">
           </div> -->
+        </div>
+      </template>
+
+      <template v-else>
+        <div class="node device-default">
+          <div class="device-name">{{ node.text }}</div>
         </div>
       </template>
 
@@ -81,22 +87,31 @@ const inputVal = ref()
 watch(
   () => props.node,
   (val) => {
-    inputVal.value = val.text
-  }
+    console.log('watch props.node>>>>>>>>>>>>>>',val)
+    // inputVal.value = val.text
+  }, {deep: true}
 )
 
 onMounted(() => {
-  inputVal.value = props.node.text
+  // inputVal.value = props.node.text
 })
 
 </script>
 
 <style lang="scss" scoped>
+.mt-10{
+  margin-top: 10px !important
+}
 .device-node-wrapper{
   width: 100%;
   height: 100%;
   .device-node-box{
     align-items: center;
+    .node{
+      background-color: #ffffff;
+      border-radius: 8px;
+      border: 1px solid #C8CCD4;
+    }
     .switch-box{
       width: 8px;
       height: 23px;
@@ -111,20 +126,14 @@ onMounted(() => {
     }
     .device-root{
       padding: 12px !important;
-      border-radius: 8px;
-      border: 1px solid #C8CCD4;
-      background-color: #ffffff;
       .root-icon{
         width: 24px;
         height: 24px;
       }
     }
-    .device-item{
+    .device-pcs{
       // margin-top: 5px !important;
       padding: 10px !important;
-      background-color: #ffffff;
-      border-radius: 8px;
-      border: 1px solid #C8CCD4;
       cursor: pointer;
       // box-shadow: 0px 0px 3px 2px rgba(0,0,0,0.03);
       &:hover{
@@ -152,16 +161,17 @@ onMounted(() => {
       }
     }
     .device-name{
-      margin-top: 12px !important;
+      // margin-top: 12px !important;
       font-size: 18px;
       font-weight: bold;
+      line-height: 35px
     }
     .device-bcc{
       align-items: center;
       padding: 0 10px !important;
-      background-color: #ffffff;
-      border-radius: 8px;
-      border: 1px solid #C8CCD4;
+    }
+    .device-default{
+      padding: 12px !important;
     }
   }
 }

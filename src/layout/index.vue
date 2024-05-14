@@ -29,9 +29,9 @@ import AppMain from './components/app-main/index.vue'
     position: absolute;
     top: 50px;
     left: 0;
-    z-index: 9;
+    // z-index: 9;
     width: 50px;
-    height: calc(100% - 60px);
+    height: calc(100% - 50px);
   }
   .main-box{
     padding-left: 50px;

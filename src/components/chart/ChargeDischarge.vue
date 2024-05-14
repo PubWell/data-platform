@@ -70,7 +70,7 @@ const setTooltip = () => {
             params[i].color.colorStops ? params[i].color.colorStops[0].color : params[i].color
           }; width:6px;height:6px; border-radius: 50%;"></div>
           <div style="margin: 0 5px;font-size: 12px;color: #73769F;line-height: 1;">${params[i].seriesName}:</div>${
-          params[i].data[2] ? params[i].data[2] : params[i].data[1] + props.options.unit
+          params[i].data[2] ? params[i].data[2] : params[i].data[1] + props.options.unit[params[i].seriesName]
         }
         </div>
         `

@@ -209,10 +209,24 @@ class Style {
   //  连线
   line(line, { width, color, dasharray } = {}, enableMarker, childNode) {
     line.stroke({ color, dasharray, width }).fill({ color: 'none' })
-    // 可以显示箭头
-    if (enableMarker) {
-      const showMarker = this.merge('showLineMarker', true)
+    
+    // 控制线的流动和方向
+    if(childNode){
+      const lineAnimation =  this.merge('lineAnimation', true)
+      const lineAnimationPositive =  this.merge('lineAnimationPositive', true)
+      const key = lineAnimationPositive ? -1 : 1
+
+      if(lineAnimation){
+        line.animate(600, 300, 'now').ease('<>').during(function(pos, morph, eased){
+          let tmr = key * 5 * 2 * pos
+          line.attr('stroke-dashoffset', tmr)
+        }).loop(true)
+      }else{
+        line.timeline().stop()
+      }
+
       const childNodeStyle = childNode.style
+      const showMarker = this.merge('showLineMarker', true)
       // 显示箭头
       if (showMarker) {
         // 创建子节点箭头标记
@@ -223,16 +237,27 @@ class Style {
         // 箭头位置可能会发生改变，所以需要先删除
         line.attr('marker-start', '')
         line.attr('marker-end', '')
+        line.attr('marker-mid', '')
         const dir = childNodeStyle.merge('lineMarkerDir')
+        // console.log(childNodeStyle._marker.id())
+        let tl = line.length(), c = tl/2, markId = childNodeStyle._marker.id()
         line.marker(dir, childNodeStyle._marker)
+        // line.marker(markId, c)
+        // line.attr('marker-mid', childNodeStyle._marker)
       } else if (childNodeStyle._marker) {
         // 不显示箭头，则删除该子节点的箭头标记
         line.attr('marker-start', '')
         line.attr('marker-end', '')
+        line.attr('marker-mid', '')
         childNodeStyle._marker.remove()
         childNodeStyle._marker = null
       }
     }
+
+    // 可以显示箭头
+    if (enableMarker) {
+    }
+    
   }
 
   // 创建箭头

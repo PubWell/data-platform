@@ -106,7 +106,7 @@ const setSeries = () => {
 
   let series = {
       type: 'bar',
-      name: props.options.name,
+      name: data.seriesList[0].yaxisName,
       itemStyle: {
         color: function (params) {
           if (maxTarget.x == minTarget.x) {
@@ -187,7 +187,7 @@ const setTooltip = () => {
     trigger: 'axis',
     formatter: (params) => {
       let html = `
-          <div style="max-height:400px;overflow:scroll; font-size: 12px">
+          <div style="max-height:400px;overflow:auto; font-size: 12px">
           <div style="margin-bottom:5px; color: #73769F">${params[0].axisValue}#</div>
         `
       for (let i = 0; i < params.length; i++) {
@@ -197,7 +197,7 @@ const setTooltip = () => {
         }
         html += `
             <div style="color: #73769F">
-              ${cur.marker}<span>${cur.seriesName}</span> ： <span style="color: #353D5C">${cur.value}${props.options.unit}</span>
+              ${cur.marker}<span>${cur.seriesName}</span> ： <span style="color: #353D5C">${cur.value}${props.options.unit[cur.seriesName]}</span>
             </div>
           `
       }

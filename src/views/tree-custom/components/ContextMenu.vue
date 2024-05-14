@@ -6,7 +6,7 @@
     :class="{ isDark: isDark }"
   >
     <template v-if="type === 'node'">
-      <div
+      <!-- <div
         class="item"
         @click="exec('INSERT_NODE', insertNodeBtnDisabled, false, [], {...node.nodeData.data, uid: new Date().getTime()})"
         :class="{ disabled: insertNodeBtnDisabled }"
@@ -29,7 +29,8 @@
       >
         <span class="name">插入父节点</span>
         <span class="desc">Shift + Tab</span>
-      </div>
+      </div> -->
+      
       <!-- <div
         class="item"
         @click="exec('ADD_GENERALIZATION')"
