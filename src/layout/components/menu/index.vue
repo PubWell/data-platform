@@ -6,31 +6,7 @@
       :collapse="isCollapse"
       :default-active="'/custom-layout/index'"
       router
-    >
-      <!-- <el-sub-menu index="1">
-        <template #title>
-          <el-icon><location /></el-icon>
-          <span>Navigator One</span>
-        </template>
-        <el-menu-item-group>
-          <template #title><span>Group One</span></template>
-          <el-menu-item index="1-1">item one</el-menu-item>
-          <el-menu-item index="1-2">item two</el-menu-item>
-        </el-menu-item-group>
-        <el-menu-item-group title="Group Two">
-          <el-menu-item index="1-3">item three</el-menu-item>
-        </el-menu-item-group>
-        <el-sub-menu index="1-4">
-          <template #title><span>item four</span></template>
-          <el-menu-item index="1-4-1">item one</el-menu-item>
-        </el-sub-menu>
-      </el-sub-menu> -->
-
-      <!-- <el-menu-item v-for="(item, index) in menus" :key="item.name">
-        <el-icon><document /></el-icon>
-        <template #title>{{item.meta.title}}</template>
-      </el-menu-item> -->
-      
+    >      
       <template v-for="route in menus" :key="route.path">
         <el-sub-menu v-if="route.children && route.children.length > 0" :index="route.path">
           <template #title>
